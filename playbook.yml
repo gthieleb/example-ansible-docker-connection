@@ -10,21 +10,19 @@
   tasks:
 
     - name: build docker image
-      docker:
+      docker_container:
         image: "centos:7"
         name: "divhide-test"
-        state: "reloaded"
-        docker_url: "{{ docker_host_url }}"
-        use_tls: "encrypt"
+        state: "started"
         command: sleep 5m
       environment:
         DOCKER_CERT_PATH: "{{ docker_host_cert_path }}"
       # register the running container
       register: docker_result
 
-    - name: add new docker connection {{ docker_result.ansible_facts.docker_containers[0].Config.Hostname }} to docker-container inventory group
+    - name: add new docker connection {{ docker_result.ansible_facts.docker_container.Config.Hostname }} to docker-container inventory group
       add_host:
-        name: "{{ docker_result.ansible_facts.docker_containers[0].Config.Hostname }}"
+        name: "{{ docker_result.ansible_facts.docker_container.Config.Hostname }}"
         groups: "docker-container"
         ansible_connection: docker
         ansible_ssh_user: "root"
